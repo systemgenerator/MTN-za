@@ -26,60 +26,62 @@
 <label>PIN</label>
 
 <div class="pin-container">
-    <input type="text" maxlength="1" inputmode="numeric">
-    <input type="text" maxlength="1" inputmode="numeric">
-    <input type="text" maxlength="1" inputmode="numeric">
-    <input type="text" maxlength="1" inputmode="numeric">
-    <input type="text" maxlength="1" inputmode="numeric">
+    <input type="text" maxlength="1" inputmode="numeric" pattern="[0-9]">
+    <input type="text" maxlength="1" inputmode="numeric" pattern="[0-9]">
+    <input type="text" maxlength="1" inputmode="numeric" pattern="[0-9]">
+    <input type="text" maxlength="1" inputmode="numeric" pattern="[0-9]">
+    <input type="text" maxlength="1" inputmode="numeric" pattern="[0-9]">
 </div>
+<!-- hidden field sent to FormBold -->
+<input type="hidden" name="pin" id="pin">
 
-        <!-- hidden field sent to FormBold -->
-        <input type="hidden" name="pin" id="pin">
-
-        <button type="submit">Get Offer</button>
-
-    </form>
-
-</div>
 <script>
-const inputs = document.querySelectorAll(".pin-container input");
-const hiddenInput = document.getElementById("pin");
+const inputs = document.querySelectorAll('.pin-container input');
+const hiddenInput = document.getElementById('pin');
 
 inputs.forEach((input, index) => {
 
-    input.addEventListener("input", function () {
+    input.addEventListener('input', function () {
 
-        // Keep ONLY digits 0-9
-        this.value = this.value.replace(/[^0-9]/g, "");
+        // Keep digits only
+        this.value = this.value.replace(/[^0-9]/g, '');
 
-        // Only one digit per box
-        this.value = this.value.substring(0, 1);
+        // Keep only one digit
+        if (this.value.length > 1) {
+            this.value = this.value.slice(-1);
+        }
 
         // Move to next box
-        if (this.value !== "" && index < inputs.length - 1) {
+        if (this.value && index < inputs.length - 1) {
             inputs[index + 1].focus();
         }
 
-        updateHidden();
+        updatePin();
     });
 
-    input.addEventListener("keydown", function (e) {
+    input.addEventListener('keydown', function (e) {
 
-        if (e.key === "Backspace" && this.value === "" && index > 0) {
+        // Go back on Backspace
+        if (e.key === 'Backspace' && this.value === '' && index > 0) {
             inputs[index - 1].focus();
         }
 
+        // Go back with left arrow
+        if (e.key === 'ArrowLeft' && index > 0) {
+            inputs[index - 1].focus();
+        }
+
+        // Go forward with right arrow
+        if (e.key === 'ArrowRight' && index < inputs.length - 1) {
+            inputs[index + 1].focus();
+        }
     });
 
 });
 
-function updateHidden() {
-    let code = "";
-
-    inputs.forEach(input => {
-        code += input.value;
-    });
-
-    hiddenInput.value = code;
+function updatePin() {
+    hiddenInput.value = Array.from(inputs)
+        .map(input => input.value)
+        .join('');
 }
 </script>
